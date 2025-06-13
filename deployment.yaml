@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-implementation-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-implementation
+  template:
+    metadata:
+      labels:
+        app: docker-implementation
+    spec:
+      containers:
+      - name: docker-implementation-container
+        image: thulasiram927/docker-implementation:latest
+        ports:
+        - containerPort: 5000
