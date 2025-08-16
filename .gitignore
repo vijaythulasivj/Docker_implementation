@@ -1,0 +1,10 @@
+# Ignore Maven target folders anywhere in the repo
+**/target/
+
+# Ignore IDE configs
+/.idea/
+/*.iml
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
