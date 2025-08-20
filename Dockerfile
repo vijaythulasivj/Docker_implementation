@@ -1,22 +1,23 @@
-# Use a basic Ubuntu base image for local testing
-FROM ubuntu:22.04
+# Use an official Jenkins agent base image with Java and basic tools
+FROM jenkins/inbound-agent:latest
 
+# Install tools as root
 USER root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git \
-        curl \
-        unzip \
         ca-certificates \
         openssh-client \
+        curl \
+        unzip \
         bash \
         gnupg \
-        software-properties-common && \
-    apt-get clean && \
+        software-properties-common \
+    && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install GitHub CLI
+# Install GitHub CLI (gh)
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
     chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
@@ -26,8 +27,8 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Optional: Install Java (if needed)
-RUN apt-get update && apt-get install -y openjdk-17-jdk
+# Switch back to the Jenkins user
+USER jenkins
 
-# Default command
-CMD ["/bin/bash"]
+# (Optional) Verify installs
+RUN git --version && java -version && gh --version
