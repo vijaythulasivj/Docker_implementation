@@ -1,20 +1,23 @@
-# Use an official Jenkins agent base image with Java and basic tools
+# Use official Jenkins agent base image
 FROM jenkins/inbound-agent:latest
 
-# Install tools as root
+# Switch to root to install dependencies
 USER root
 
+# Install essential tools
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git \
         ca-certificates \
-        openssh-client \
         curl \
         unzip \
         bash \
         gnupg \
         software-properties-common \
-    && apt-get clean && \
+        openssh-client && \
+    # Force /bin/sh to point to bash for better compatibility
+    ln -sf /bin/bash /bin/sh && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install GitHub CLI (gh)
@@ -27,8 +30,10 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Switch back to the Jenkins user
-USER jenkins
+# Diagnostics (optional)
+RUN bash -c "echo ✅ Shell: \$(which sh); bash --version" && \
+    git --version && \
+    gh --version
 
-# (Optional) Verify installs
-RUN git --version && java -version && gh --version
+# Switch back to Jenkins user
+USER jenkins
